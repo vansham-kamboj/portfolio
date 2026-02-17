@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vansham - Community Founder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Override Community Color to Subtle Purple */
+        :root {
+            --color-community: #9333ea;
+            --color-community-soft: #d8b4fe;
+        }
+
+        /* Custom scrollbar for the modal */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* Subtle Purple Border on Hover for Project Cards */
+        .project-card:hover {
+            border-color: var(--color-community-soft) !important;
+            box-shadow: 0 10px 40px -10px rgba(147, 51, 234, 0.15);
+        }
+        
+        /* Subtle Purple Hover for Top Header Pills */
+        #header-tags .pill-tag {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        #header-tags .pill-tag:hover {
+            background-color: #faf5ff !important;
+            color: var(--color-community) !important;
+            border-color: var(--color-community-soft) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px -2px rgba(147, 51, 234, 0.15);
+        }
+
+        /* Sidebar Active Link Color Override */
+        .sidebar-link.active {
+            border-left-color: var(--color-community) !important;
+            color: var(--color-community) !important;
+        }
+        
+        /* Hide elements initially to prevent flicker before GSAP kicks in */
+        .gsap-hide { visibility: hidden; }
+        
+        /* Remove CSS transition from modal so GSAP has full control */
+        #project-modal.hide { display: none; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-purple-100 selection:text-purple-900">
+
+    <button id="audio-toggle" onclick="audioManager.toggle()" title="Toggle Sound">
+        <i data-lucide="volume-x" id="audio-icon" class="w-5 h-5"></i>
+    </button>
+
+    <div id="wiki-layout" class="flex flex-col min-h-screen bg-white">
+        
+        <nav class="py-3 px-4 md:py-4 md:px-10 flex items-center justify-between sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-transparent gsap-hide" id="main-nav">
+            <div class="flex items-center gap-2 md:gap-4">
+                <a href="index.html" class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors group" title="Change Character">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-500 group-hover:text-black"></i>
+                </a>
+                <a href="index.html" class="flex items-center gap-2 md:gap-3 cursor-pointer">
+                    <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-bold text-sm">V</div>
+                    <div class="font-bold text-lg tracking-tight">Vansham</div>
+                </a>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="bg-black text-white px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs font-bold hover:bg-gray-800 transition-all shadow-lg shadow-black/10">Contact</button>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row flex-1 max-w-[1400px] mx-auto w-full relative">
+
+            <aside class="w-full md:w-56 lg:w-64 p-8 hidden md:block sticky top-20 h-[calc(100vh-80px)] overflow-y-auto gsap-hide" id="sidebar-menu">
+                <div class="font-bold text-black mb-6 text-xs uppercase tracking-widest opacity-40">Quick Index</div>
+                <ul class="space-y-2 text-sm font-medium text-gray-500" id="sidebar-nav">
+                    <li class="sidebar-item"><a href="#intro" class="sidebar-link block text-black active">Introduction</a></li>
+                    <li class="sidebar-item"><a href="#biography" class="sidebar-link block hover:text-black">Biography</a></li>
+                    <li class="sidebar-item"><a href="#projects" class="sidebar-link block hover:text-black"><span id="sidebar-work-label">Community Initiatives</span></a></li>
+                </ul>
+                <div class="mt-12 p-4 bg-gray-50 rounded-2xl border border-gray-100 sidebar-context">
+                    <p class="text-xs text-gray-400 mb-2">Current Context</p>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                        </span>
+                        <span class="text-xs font-bold text-black" id="status-pill">Building Communities</span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1 p-6 md:p-12 min-w-0" id="main-content">
+                <div class="pb-8 mb-12 border-b border-gray-100 gsap-hide" id="header-section">
+                    <h1 class="wiki-header-title text-black mb-2 origin-left" id="page-title">Community<br>Leader.</h1>
+                    <div class="flex items-center flex-wrap gap-4 mt-6">
+                        <div class="flex flex-wrap gap-2" id="header-tags">
+                             <span class="pill-tag bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium border border-gray-200">The Hackers Meetup</span>
+                             <span class="pill-tag bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium border border-gray-200">AWS User Group</span>
+                             <span class="pill-tag bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium border border-gray-200">GDG ITMBU</span>
+                             <span class="pill-tag bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium border border-gray-200">TechnoLab</span>
+                        </div>
+                    </div>
+                </div>
+
+                <section id="intro" class="mb-16 text-lg md:text-2xl leading-relaxed text-gray-800 font-light gsap-hide">
+                    <p class="mb-6 intro-text"><span class="font-semibold text-black">Vansham</span> curates whole vibes, not just events.</p>
+                    <p class="text-base text-gray-500 leading-loose max-w-2xl intro-text">No boring sessions allowed. He builds spaces where people genuinely enjoy, learn, and grow together. Whether managing 500+ attendee AWS events or driving interactive sessions at The Hackers Meetup, he blends logistics, design, and marketing to build thriving tech cultures.</p>
+                </section>
+
+                <section id="biography" class="mb-20">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-8 gsap-hide bio-title">Biography</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="bio-grid">
+                        <div class="bg-gray-50 p-6 md:p-8 rounded-[2rem] hover:bg-white hover:shadow-sm border border-transparent hover:border-purple-100 transition-all group gsap-hide bio-card">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm group-hover:text-purple-600 transition-colors"><i data-lucide="users" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-lg mb-2">Leadership & Mentorship</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed">Co-lead of The Hackers Meetup Vadodara & Mentor at TechnoLab Club ITMBU.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 md:p-8 rounded-[2rem] hover:bg-white hover:shadow-sm border border-transparent hover:border-purple-100 transition-all group gsap-hide bio-card">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm group-hover:text-purple-600 transition-colors"><i data-lucide="mic" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-lg mb-2">Event Management</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed">Managed on-site logistics and social media for massive AWS events scaling over 500+ attendees.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 md:p-8 rounded-[2rem] hover:bg-white hover:shadow-sm border border-transparent hover:border-purple-100 transition-all group gsap-hide bio-card">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm group-hover:text-purple-600 transition-colors"><i data-lucide="pen-tool" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-lg mb-2">Creative & Marketing</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed">Ex-Creative Head at GDG ITMBU. Replaced "boring" event posts with engaging reel-based marketing at TechnoLab.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 md:p-8 rounded-[2rem] hover:bg-white hover:shadow-sm border border-transparent hover:border-purple-100 transition-all group gsap-hide bio-card">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm group-hover:text-purple-600 transition-colors"><i data-lucide="globe" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-lg mb-2">Web3 & Speaking</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed">Frequent speaker at GDG. Event host and swag manager for Pu Dao's Web3 community.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="projects" class="mb-20">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-10 project-title gsap-hide" id="section-work-title">Community Initiatives</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="projects-grid">
+                        
+                        <div onclick="openCommunityModal('aws')" class="project-card p-6 md:p-8 bg-gray-50 rounded-[1.5rem] group cursor-pointer overflow-hidden gsap-hide border border-transparent">
+                            <div class="flex justify-between items-start mb-8 md:mb-12">
+                                <div class="flex gap-2"><span class="bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium">Volunteer</span></div>
+                                <div class="flex items-center gap-2 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                                    <span class="text-xs font-bold text-purple-600 hidden sm:block uppercase tracking-wider">View</span>
+                                    <div class="w-8 h-8 bg-black group-hover:bg-purple-600 rounded-full flex items-center justify-center text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="mb-4 relative z-10">
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">AWS User Group Vadodara</h3>
+                                <p class="text-xs md:text-sm text-gray-500">Managed social media and on-site operations for massive tech events scaling over 500+ attendees.</p>
+                            </div>
+                            <div class="w-full h-40 md:h-48 bg-gray-200 rounded-2xl overflow-hidden mt-4 md:mt-6 relative">
+                                 <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunityModal('hackers')" class="project-card p-6 md:p-8 bg-gray-50 rounded-[1.5rem] group cursor-pointer overflow-hidden gsap-hide border border-transparent">
+                            <div class="flex justify-between items-start mb-8 md:mb-12">
+                                <div class="flex gap-2"><span class="bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium">Co-Lead</span></div>
+                                <div class="flex items-center gap-2 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                                    <span class="text-xs font-bold text-purple-600 hidden sm:block uppercase tracking-wider">View</span>
+                                    <div class="w-8 h-8 bg-black group-hover:bg-purple-600 rounded-full flex items-center justify-center text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="mb-4 relative z-10">
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">The Hackers Meetup</h3>
+                                <p class="text-xs md:text-sm text-gray-500">Leading a premier cybersecurity community. Managing teams, event venues, and engaging activities.</p>
+                            </div>
+                            <div class="w-full h-40 md:h-48 bg-gray-200 rounded-2xl overflow-hidden mt-4 md:mt-6 relative">
+                                 <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunityModal('gdg')" class="project-card p-6 md:p-8 bg-gray-50 rounded-[1.5rem] group cursor-pointer overflow-hidden gsap-hide border border-transparent">
+                            <div class="flex justify-between items-start mb-8 md:mb-12">
+                                <div class="flex gap-2"><span class="bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium">Creative Head</span></div>
+                                <div class="flex items-center gap-2 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                                    <span class="text-xs font-bold text-purple-600 hidden sm:block uppercase tracking-wider">View</span>
+                                    <div class="w-8 h-8 bg-black group-hover:bg-purple-600 rounded-full flex items-center justify-center text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="mb-4 relative z-10">
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">GDG ITMBU</h3>
+                                <p class="text-xs md:text-sm text-gray-500">Drove the creative and marketing initiatives while frequently taking the stage as a speaker.</p>
+                            </div>
+                            <div class="w-full h-40 md:h-48 bg-gray-200 rounded-2xl overflow-hidden mt-4 md:mt-6 relative">
+                                 <img src="https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunityModal('technolab')" class="project-card p-6 md:p-8 bg-gray-50 rounded-[1.5rem] group cursor-pointer overflow-hidden gsap-hide border border-transparent">
+                            <div class="flex justify-between items-start mb-8 md:mb-12">
+                                <div class="flex gap-2"><span class="bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium">Mentor</span></div>
+                                <div class="flex items-center gap-2 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                                    <span class="text-xs font-bold text-purple-600 hidden sm:block uppercase tracking-wider">View</span>
+                                    <div class="w-8 h-8 bg-black group-hover:bg-purple-600 rounded-full flex items-center justify-center text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="mb-4 relative z-10">
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">TechnoLab Club</h3>
+                                <p class="text-xs md:text-sm text-gray-500">Mentoring students, hosting engaging workshops, and revolutionizing campus marketing with reels.</p>
+                            </div>
+                            <div class="w-full h-40 md:h-48 bg-gray-200 rounded-2xl overflow-hidden mt-4 md:mt-6 relative">
+                                 <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunityModal('pudao')" class="project-card p-6 md:p-8 bg-gray-50 rounded-[1.5rem] group cursor-pointer overflow-hidden md:col-span-2 max-w-2xl mx-auto w-full gsap-hide border border-transparent">
+                            <div class="flex justify-between items-start mb-8 md:mb-12">
+                                <div class="flex gap-2"><span class="bg-white border border-gray-200 rounded-full px-3 py-1 text-xs font-medium">Event Manager</span></div>
+                                <div class="flex items-center gap-2 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                                    <span class="text-xs font-bold text-purple-600 hidden sm:block uppercase tracking-wider">View Details</span>
+                                    <div class="w-8 h-8 bg-black group-hover:bg-purple-600 rounded-full flex items-center justify-center text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                                </div>
+                            </div>
+                            <div class="mb-4 relative z-10">
+                                <h3 class="text-xl md:text-2xl font-bold mb-2">Pu Dao Web3 Community</h3>
+                                <p class="text-xs md:text-sm text-gray-500">Helping manage Web3 events, hosting sessions, and handling swag distributions for the community.</p>
+                            </div>
+                            <div class="w-full h-40 md:h-64 bg-gray-200 rounded-2xl overflow-hidden mt-4 md:mt-6 relative">
+                                 <img src="https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&q=80&w=1200" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </main>
+
+            <aside class="w-full md:w-80 lg:w-96 p-6 md:pr-10 order-last md:order-none gsap-hide" id="profile-info">
+                <div class="infobox w-full md:sticky md:top-24 border border-gray-200 bg-white rounded-3xl overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
+                    <div id="canvas-container" class="relative group" title="Interact with me!">
+                        <div class="absolute top-4 left-4 z-10 pointer-events-none">
+                             <span class="bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-gray-200">Interactive</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-1">Vansham</h3>
+                        <p class="text-gray-500 text-sm mb-6" id="info-role">Community Leader</p>
+
+                        <div class="space-y-4" id="info-stats">
+                            <div class="flex justify-between items-start py-2 border-b border-gray-100">
+                                <span class="text-xs font-bold text-gray-400 uppercase mt-1">EVENTS SCALED</span>
+                                <span class="text-sm font-medium">500+ Attendees</span>
+                            </div>
+                            <div class="flex justify-between items-start py-2 border-b border-gray-100">
+                                <span class="text-xs font-bold text-gray-400 uppercase mt-1">ROLES</span>
+                                <div class="flex flex-wrap gap-1 justify-end max-w-[150px]">
+                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold">Co-Lead</span>
+                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold">Mentor</span>
+                                    <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold">Creative Head</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 bg-black text-white py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform">Get in Touch</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="bg-[#111] text-white py-12 md:py-20 px-6 mt-12 w-full" id="site-footer">
+            <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
+                <div class="footer-content gsap-hide">
+                    <h2 class="text-4xl md:text-7xl font-bold tracking-tighter mb-6">Let's Connect<br>There.</h2>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#" class="px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all text-sm md:text-base">LinkedIn</a>
+                        <a href="#" class="px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all text-sm md:text-base">Twitter</a>
+                        <a href="#" class="px-6 py-3 bg-white text-black rounded-full font-bold hover:scale-105 transition-transform text-sm md:text-base">Email Me</a>
+                    </div>
+                </div>
+                <div class="text-left md:text-right text-gray-500 text-sm w-full md:w-auto border-t md:border-t-0 border-gray-800 pt-6 md:pt-0 footer-content gsap-hide">
+                    <p class="mb-2">Based in Vadodara, India.</p>
+                    <p>&copy; 2026 Vansham Kamboj.</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <div id="project-modal" class="fixed inset-0 z-[60] hide flex items-center justify-center p-4">
+        <div id="modal-bg" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 cursor-pointer" onclick="closeCommunityModal()"></div>
+        
+        <div id="modal-content-card" class="modal-content bg-white w-full max-w-4xl h-[85vh] rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden border border-gray-200 z-10 opacity-0">
+            
+            <button onclick="closeCommunityModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 hover:bg-white backdrop-blur rounded-full flex items-center justify-center border border-gray-200 transition-all shadow-sm">
+                <i data-lucide="x" class="w-5 h-5 text-black"></i>
+            </button>
+
+            <div class="overflow-y-auto flex-1 custom-scrollbar flex flex-col">
+                <div class="h-64 md:h-80 bg-gray-200 relative shrink-0 overflow-hidden">
+                    <img id="modal-img" src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end p-8">
+                        <div>
+                            <div class="flex gap-2 mb-3">
+                                <span id="modal-tag" class="bg-white text-black px-3 py-1 rounded-full text-xs font-bold">Tag</span>
+                                <span id="modal-year" class="bg-black/50 text-white backdrop-blur px-3 py-1 rounded-full text-xs font-bold border border-white/20">Year</span>
+                            </div>
+                            <h2 id="modal-title" class="text-4xl md:text-5xl font-bold text-white tracking-tight">Title</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 md:p-12 shrink-0">
+                    <div class="max-w-3xl mx-auto">
+                        <p id="modal-desc" class="text-xl text-gray-800 font-medium mb-10 leading-relaxed"></p>
+                        <div id="modal-body-content" class="text-gray-600">
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer p-4 md:p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center mt-auto">
+                    <span class="text-xs text-gray-400 font-mono tracking-wider">COMMUNITY PROJECT</span>
+                    <button class="bg-black text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-purple-600 transition-colors shadow-lg shadow-black/10 flex items-center gap-2">
+                        View Live Event <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        // Init 3D Shape
+        document.addEventListener('DOMContentLoaded', () => {
+            threeJS.init('sphere'); 
+            lucide.createIcons();
+
+            // Register GSAP ScrollTrigger
+            gsap.registerPlugin(ScrollTrigger);
+
+            // 1. Initial Load Animations (The Cascade)
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            // Reveal everything from visibility: hidden right as animation starts
+            gsap.set(".gsap-hide", { autoAlpha: 1 }); 
+
+            // Nav and Profile Info slide in
+            tl.from("#main-nav", { y: -20, opacity: 0, duration: 0.8 })
+              .from("#sidebar-menu", { x: -30, opacity: 0, duration: 0.8 }, "-=0.6")
+              .from("#profile-info", { x: 30, opacity: 0, duration: 0.8 }, "-=0.8")
+              
+              // BLUR REVEAL for the main title
+              .fromTo("#page-title", 
+                  { filter: "blur(15px)", opacity: 0, y: 30, scale: 0.95 },
+                  { filter: "blur(0px)", opacity: 1, y: 0, scale: 1, duration: 1.2, ease: "power3.out" }, 
+                  "-=0.4"
+              )
+              
+              // Sidebar items stagger in
+              .from(".sidebar-item", { x: -10, opacity: 0, stagger: 0.1, duration: 0.5 }, "-=1")
+              .from(".sidebar-context", { opacity: 0, y: 10, duration: 0.5 }, "-=0.8")
+              
+              // Tags - Changed from .from() to .fromTo() to guarantee they become fully visible
+              .fromTo("#header-tags .pill-tag", 
+                  { y: 20, opacity: 0 }, 
+                  { y: 0, opacity: 1, stagger: 0.08, duration: 0.6 }, 
+                  "-=1"
+              )
+              .from(".intro-text", { y: 20, opacity: 0, stagger: 0.15, duration: 0.8 }, "-=0.8")
+              
+              // Bio Section
+              .from(".bio-title", { y: 20, opacity: 0, duration: 0.6 }, "-=0.6")
+              .from(".bio-card", { y: 30, opacity: 0, stagger: 0.1, duration: 0.7 }, "-=0.5");
+
+            // 2. Premium Scroll Animations for Projects
+            gsap.from(".project-title", {
+                scrollTrigger: { trigger: ".project-title", start: "top 85%" },
+                y: 30, opacity: 0, duration: 0.8, ease: "power3.out"
+            });
+
+            // Gentle pop-up scale effect for cards
+            gsap.utils.toArray(".project-card").forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%", 
+                        toggleActions: "play none none reverse" 
+                    },
+                    y: 50,
+                    scale: 0.95, // Adds that premium feel
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: "back.out(1.2)" // Springy finish
+                });
+            });
+
+            // 3. Scroll Animation for Footer
+            gsap.from(".footer-content", {
+                scrollTrigger: { trigger: "#site-footer", start: "top 90%" },
+                y: 30, opacity: 0, stagger: 0.2, duration: 0.8, ease: "power2.out"
+            });
+        });
+
+        // --------------------------------------------------------
+        // SCROLL SPY LOGIC FOR SIDEBAR
+        // --------------------------------------------------------
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollY = window.pageYOffset;
+
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 250; 
+                const sectionId = current.getAttribute('id');
+                const sidebarLink = document.querySelector(`.sidebar-link[href*="${sectionId}"]`);
+
+                if (sidebarLink) {
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        document.querySelectorAll('.sidebar-link').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        sidebarLink.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // --------------------------------------------------------
+        // MODAL DATA & GSAP ANIMATION LOGIC
+        // --------------------------------------------------------
+        const communityData = {
+            aws: {
+                title: "AWS User Group Vadodara",
+                tag: "Volunteer",
+                year: "Ongoing",
+                img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800",
+                desc: "Working with the AWS User Group Vadodara as a volunteer to learn and manage massive tech events.",
+                details: `
+                    <h3 class="text-black font-bold text-2xl mb-4">Managing Scale</h3>
+                    <p class="mb-6">I played a pivotal role in organizing events that scaled to over 500+ attendees. Coordinating at this level requires immense planning, quick problem solving, and perfect execution.</p>
+                    
+                    <h3 class="text-black font-bold text-2xl mb-4">My Core Contributions</h3>
+                    <ul class="list-none space-y-4 mb-6">
+                        <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Social Media Team:</b> Managed the digital footprint and marketing to drive registrations and build hype for an event of 500+ people.</span></li>
+                        <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>On-Site Operations:</b> Worked directly on the ground to ensure the entire event ran smoothly, from crowd control to technical setups.</span></li>
+                    </ul>
+                `
+            },
+            hackers: {
+                title: "The Hackers Meetup",
+                tag: "Co-Lead",
+                year: "Vadodara Chapter",
+                img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=800",
+                desc: "Co-leading a premier cybersecurity community, focusing on engagement, team management, and operations.",
+                details: `
+                    <h3 class="text-black font-bold text-2xl mb-4">End-to-End Workflow</h3>
+                    <p class="mb-6">Because I also work as a designer for the community, I have a deep understanding of the entire workflow. My role goes far beyond just leading—it's about building an experience.</p>
+                    
+                    <h3 class="text-black font-bold text-2xl mb-4">Key Responsibilities</h3>
+                    <ul class="list-none space-y-4 mb-6">
+                        <li class="flex gap-3"><i data-lucide="map-pin" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Logistics:</b> Selecting venues perfectly suited for our audience size and technical needs.</span></li>
+                        <li class="flex gap-3"><i data-lucide="users" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Networking:</b> Finding and inviting industry professionals to speak at our events and meetups.</span></li>
+                        <li class="flex gap-3"><i data-lucide="smartphone" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Marketing:</b> Handling organic social media marketing (without relying on paid ads) to build genuine community growth.</span></li>
+                        <li class="flex gap-3"><i data-lucide="message-square" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Engagement:</b> Organizing fun activities, debates, and group discussions to ensure the audience isn't just listening, but actively participating.</span></li>
+                    </ul>
+                `
+            },
+            gdg: {
+                title: "GDG on campus ITMBU",
+                tag: "Creative Head",
+                year: "Past",
+                img: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&q=80&w=800",
+                desc: "Served as the Creative Head, blending design, marketing, and public speaking.",
+                details: `
+                    <h3 class="text-black font-bold text-2xl mb-4">Driving the Creative Vision</h3>
+                    <p class="mb-6">As the Creative Head for Google Developer Groups on campus, my primary focus was on establishing a strong visual and marketing presence for the community.</p>
+                    
+                    <h3 class="text-black font-bold text-2xl mb-4">Impact</h3>
+                    <p class="mb-6">I led all marketing and design efforts, ensuring our events looked professional and inviting. Beyond behind-the-scenes work, I was also a frequent speaker, delivering talks and engaging directly with the student developer community multiple times.</p>
+                `
+            },
+            technolab: {
+                title: "TechnoLab Club ITMBU",
+                tag: "Mentor",
+                year: "Ongoing",
+                img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800",
+                desc: "Mentoring students and redefining how campus communities approach marketing.",
+                details: `
+                    <h3 class="text-black font-bold text-2xl mb-4">Guiding the Next Generation</h3>
+                    <p class="mb-6">At TechnoLab Club, we created a dedicated team that hosts engaging events, sessions, and workshops specifically designed to help students grow their skills.</p>
+                    
+                    <h3 class="text-black font-bold text-2xl mb-4">Revolutionizing Campus Marketing</h3>
+                    <p class="mb-6">One of my proudest achievements here was shifting the culture of campus marketing. We moved away from the traditional, "boring" community posts and started creating highly engaging, fun reels that actually resonated with the student body, vastly increasing our reach and engagement.</p>
+                `
+            },
+            pudao: {
+                title: "Pu Dao Web3 Community",
+                tag: "Event Manager",
+                year: "Ongoing",
+                img: "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&q=100&w=1200",
+                desc: "Managing events and logistics for a growing Web3 community.",
+                details: `
+                    <h3 class="text-black font-bold text-2xl mb-4">Into the Web3 Space</h3>
+                    <p class="mb-6">Web3 events require a different kind of energy and logistical approach. I assist Pu Dao in making sure their meetups run flawlessly.</p>
+                    
+                    <h3 class="text-black font-bold text-2xl mb-4">My Role</h3>
+                    <p class="mb-6">I help host the events, manage the floor, and handle the crucial task of swag distribution, ensuring every attendee leaves with a great impression of the community.</p>
+                `
+            }
+        };
+
+        function openCommunityModal(id) {
+            if(typeof audioManager !== 'undefined' && audioManager.playClick) {
+                audioManager.playClick();
+            }
+            
+            const data = communityData[id];
+            if(!data) return;
+
+            // Load Data
+            document.getElementById('modal-title').innerHTML = data.title;
+            document.getElementById('modal-desc').innerHTML = data.desc;
+            document.getElementById('modal-tag').innerHTML = data.tag;
+            document.getElementById('modal-year').innerHTML = data.year;
+            document.getElementById('modal-img').src = data.img;
+            document.getElementById('modal-body-content').innerHTML = data.details;
+            lucide.createIcons();
+
+            const modal = document.getElementById('project-modal');
+            const bg = document.getElementById('modal-bg');
+            const card = document.getElementById('modal-content-card');
+
+            // Show container
+            modal.classList.remove('hide');
+
+            // --- THE NEW GSAP MODAL REVEAL TIMELINE ---
+            const modalTl = gsap.timeline();
+            
+            // 1. Fade in dark background
+            modalTl.fromTo(bg, { opacity: 0 }, { opacity: 1, duration: 0.3 })
+            
+            // 2. Pop the main card up and un-blur
+            .fromTo(card, 
+                { opacity: 0, scale: 0.95, y: 20, filter: "blur(10px)" }, 
+                { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "back.out(1.2)" }, 
+                "<0.1"
+            )
+            
+            // 3. Image scales down and un-blurs
+            .fromTo("#modal-img", 
+                { scale: 1.1, opacity: 0, filter: "blur(10px)" }, 
+                { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 
+                "-=0.2"
+            )
+            
+            // 4. Tags drop in
+            .fromTo(["#modal-tag", "#modal-year"], 
+                { y: 15, opacity: 0 }, 
+                { y: 0, opacity: 1, stagger: 0.1, duration: 0.4, ease: "power2.out" }, 
+                "-=0.4"
+            )
+            
+            // 5. Title un-blurs
+            .fromTo("#modal-title", 
+                { y: 20, opacity: 0, filter: "blur(8px)" }, 
+                { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "power3.out" }, 
+                "-=0.3"
+            )
+            
+            // 6. Text content slides up
+            .fromTo("#modal-desc", 
+                { y: 20, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 
+                "-=0.3"
+            )
+            .fromTo("#modal-body-content", 
+                { y: 20, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 
+                "-=0.3"
+            )
+            
+            // 7. Footer slides up
+            .fromTo(".modal-footer", 
+                { y: 20, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 
+                "-=0.2"
+            );
+        }
+
+        function closeCommunityModal() {
+            if(typeof audioManager !== 'undefined' && audioManager.playClick) {
+                audioManager.playClick();
+            }
+            
+            const modal = document.getElementById('project-modal');
+            const bg = document.getElementById('modal-bg');
+            const card = document.getElementById('modal-content-card');
+
+            // Smooth close out animation
+            gsap.to([bg, card], { 
+                opacity: 0, 
+                scale: 0.98, 
+                y: -10, 
+                filter: "blur(5px)", 
+                duration: 0.3, 
+                stagger: 0.05,
+                onComplete: () => {
+                    modal.classList.add('hide');
+                    // Reset inline styles so it animates cleanly next time
+                    gsap.set(card, { clearProps: "all" });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

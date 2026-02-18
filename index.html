@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vansham - Community Management</title>
+    <title>Vansham - Community  Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -342,9 +342,6 @@
                 
                 <div class="modal-footer p-4 md:p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center mt-auto">
                     <span class="text-xs text-gray-400 font-mono tracking-wider">COMMUNITY PROJECT</span>
-                    <button class="bg-black text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-purple-600 transition-colors shadow-lg shadow-black/10 flex items-center gap-2">
-                        View Live Event <i data-lucide="external-link" class="w-4 h-4"></i>
-                    </button>
                 </div>
             </div>
         </div>
@@ -352,265 +349,263 @@
 
     <script src="main.js"></script>
     <script>
-        // Init 3D Shape
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof threeJS !== 'undefined') threeJS.init('sphere'); 
-            lucide.createIcons();
+/**
+ * Vansham Kamboj - Portfolio Main Script
+ * Version: 4.0 (Safe-Fail Logic + Original Content)
+ */
 
-            // Register GSAP ScrollTrigger
-            gsap.registerPlugin(ScrollTrigger);
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. INITIALIZE EXTERNAL LIBRARIES
+    if (typeof threeJS !== 'undefined' && typeof threeJS.init === 'function') {
+        threeJS.init('sphere'); 
+    }
+    lucide.createIcons();
+    gsap.registerPlugin(ScrollTrigger);
 
-            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+    // 2. CRITICAL MOBILE FIX: IMMEDIATE VISIBILITY
+    // We force all elements to be visible immediately. 
+    // This stops the "blank screen" bug on mobile chrome/safari.
+    gsap.set(".gsap-hide", { autoAlpha: 1, visibility: "visible" });
+    
+    // Ensure cards are fully visible without any GSAP transforms
+    // We removed the scroll-trigger entrance for these specific cards to ensure stability
+    gsap.set(".project-card", { opacity: 1, y: 0, scale: 1 });
 
-            gsap.set(".gsap-hide", { autoAlpha: 1 }); 
+    // 3. HERO SECTION ANIMATIONS (Safe to keep)
+    const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
-            tl.from("#main-nav", { y: -20, opacity: 0, duration: 0.8 })
-              .from("#sidebar-menu", { x: -30, opacity: 0, duration: 0.8 }, "-=0.6")
-              .from("#profile-info", { x: 30, opacity: 0, duration: 0.8 }, "-=0.8")
-              .fromTo("#page-title", 
-                  { filter: "blur(15px)", opacity: 0, y: 30, scale: 0.95 },
-                  { filter: "blur(0px)", opacity: 1, y: 0, scale: 1, duration: 1.2, ease: "power3.out" }, 
-                  "-=0.4"
-              )
-              .from(".sidebar-item", { x: -10, opacity: 0, stagger: 0.1, duration: 0.5 }, "-=1")
-              .from(".sidebar-context", { opacity: 0, y: 10, duration: 0.5 }, "-=0.8")
-              .fromTo("#header-tags .pill-tag", 
-                  { y: 20, opacity: 0 }, 
-                  { y: 0, opacity: 1, stagger: 0.08, duration: 0.6 }, 
-                  "-=1"
-              )
-              .from(".intro-text", { y: 20, opacity: 0, stagger: 0.15, duration: 0.8 }, "-=0.8")
-              .from(".bio-title", { y: 20, opacity: 0, duration: 0.6 }, "-=0.6")
-              .from(".bio-card", { y: 30, opacity: 0, stagger: 0.1, duration: 0.7 }, "-=0.5");
+    tl.from("#main-nav", { y: -20, opacity: 0, duration: 0.8 })
+      .from("#sidebar-menu", { x: -30, opacity: 0, duration: 0.8 }, "-=0.6")
+      .from("#profile-info", { x: 30, opacity: 0, duration: 0.8 }, "-=0.8")
+      .fromTo("#page-title", 
+          { filter: "blur(15px)", opacity: 0, y: 30, scale: 0.95 },
+          { filter: "blur(0px)", opacity: 1, y: 0, scale: 1, duration: 1.2, ease: "power3.out" }, 
+          "-=0.4"
+      )
+      .from(".sidebar-item", { x: -10, opacity: 0, stagger: 0.1, duration: 0.5 }, "-=1")
+      .from(".sidebar-context", { opacity: 0, y: 10, duration: 0.5 }, "-=0.8")
+      .fromTo("#header-tags .pill-tag", 
+          { y: 20, opacity: 0 }, 
+          { y: 0, opacity: 1, stagger: 0.08, duration: 0.6 }, 
+          "-=1"
+      )
+      .from(".intro-text", { y: 20, opacity: 0, stagger: 0.15, duration: 0.8 }, "-=0.8")
+      .from(".bio-title", { y: 20, opacity: 0, duration: 0.6 }, "-=0.6")
+      .from(".bio-card", { y: 30, opacity: 0, stagger: 0.1, duration: 0.7 }, "-=0.5");
 
-            gsap.from(".project-title", {
-                scrollTrigger: { trigger: ".project-title", start: "top 85%" },
-                y: 30, opacity: 0, duration: 0.8, ease: "power3.out"
-            });
+    // 4. FOOTER REVEAL (Subtle)
+    gsap.from(".footer-content", {
+        scrollTrigger: { trigger: "#site-footer", start: "top 90%" },
+        y: 30, opacity: 0, stagger: 0.2, duration: 0.8, ease: "power2.out"
+    });
 
-            gsap.utils.toArray(".project-card").forEach((card, i) => {
-                gsap.from(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 85%", 
-                        toggleActions: "play none none reverse" 
-                    },
-                    y: 50,
-                    scale: 0.95, 
-                    opacity: 0,
-                    duration: 0.8,
-                    ease: "back.out(1.2)" 
+    // 5. REFRESH TRIGGERS (Mobile Layout Adjustment)
+    window.addEventListener('load', () => {
+        ScrollTrigger.refresh();
+    });
+});
+
+// 6. SCROLL SPY LOGIC FOR SIDEBAR
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section[id]');
+    const scrollY = window.pageYOffset;
+
+    sections.forEach(current => {
+        const sectionHeight = current.offsetHeight;
+        const sectionTop = current.offsetTop - 250; 
+        const sectionId = current.getAttribute('id');
+        const sidebarLink = document.querySelector(`.sidebar-link[href*="${sectionId}"]`);
+
+        if (sidebarLink) {
+            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.classList.remove('active');
                 });
-            });
-
-            gsap.from(".footer-content", {
-                scrollTrigger: { trigger: "#site-footer", start: "top 90%" },
-                y: 30, opacity: 0, stagger: 0.2, duration: 0.8, ease: "power2.out"
-            });
-        });
-
-        // SCROLL SPY LOGIC FOR SIDEBAR
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section[id]');
-            const scrollY = window.pageYOffset;
-
-            sections.forEach(current => {
-                const sectionHeight = current.offsetHeight;
-                const sectionTop = current.offsetTop - 250; 
-                const sectionId = current.getAttribute('id');
-                const sidebarLink = document.querySelector(`.sidebar-link[href*="${sectionId}"]`);
-
-                if (sidebarLink) {
-                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                        document.querySelectorAll('.sidebar-link').forEach(link => {
-                            link.classList.remove('active');
-                        });
-                        sidebarLink.classList.add('active');
-                    }
-                }
-            });
-        });
-
-        // --------------------------------------------------------
-        // MODAL DATA WITH CLICKABLE IMAGE LINKS (SCREENSHOTS)
-        // --------------------------------------------------------
-        const communityData = {
-            aws: {
-                title: "AWS User Group Vadodara",
-                tag: "Volunteer",
-                year: "Ongoing",
-                img: "./images/aws-header.jpg",
-                desc: "Volunteering with the AWS User Group Vadodara to learn and manage massive tech events.",
-                details: `
-                    <h3 class="text-black font-bold text-2xl mb-4">Managing Scale</h3>
-                    <p class="mb-6">I played a pivotal role in organizing events that scaled to over 500+ attendees. Coordinating at this level requires immense planning, quick problem solving, and perfect execution.</p>
-                    
-                    <h3 class="text-black font-bold text-2xl mb-4">My Core Contributions</h3>
-                    <ul class="list-none space-y-4 mb-6">
-                        <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Social Media Team:</b> Managed the digital footprint and marketing to drive registrations and build hype for an event of 500+ people.</span></li>
-                        <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>On-Site Operations:</b> Worked directly on the ground to ensure the entire event ran smoothly, from crowd control to technical setups.</span></li>
-                    </ul>
-                `,
-                // Paste your screenshot link below in 'img'
-                socialLink: {
-                    img: "./images/AWS.png", 
-                    url: "https://www.linkedin.com/posts/vansham-kamboj_alwayslearning-awscommunityday-gratefulforopportunities-activity-7254410923409350656-UpRe?utm_source=share&utm_medium=member_desktop&rcm=ACoAADa3VwUBwfmJDSwSDVxUTbpdcD17CKGHA0U"
-                }
-            },
-            hackers: {
-                title: "The Hackers Meetup",
-                tag: "Co-Lead",
-                year: "Vadodara Chapter",
-                img: "./images/thm-header.jpg",
-                desc: "Co-leading a premier cybersecurity community, focusing on engagement, team management, and operations.",
-                details: `
-                    <h3 class="text-black font-bold text-2xl mb-4">End-to-End Workflow</h3>
-                    <p class="mb-6">Because I also work as a designer for the community, I have a deep understanding of the entire workflow. My role goes far beyond just leading—it's about building an experience.</p>
-                    
-                    <h3 class="text-black font-bold text-2xl mb-4">Key Responsibilities</h3>
-                    <ul class="list-none space-y-4 mb-6">
-                        <li class="flex gap-3"><i data-lucide="map-pin" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Logistics:</b> Selecting venues perfectly suited for our audience size and technical needs.</span></li>
-                        <li class="flex gap-3"><i data-lucide="users" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Networking:</b> Finding and inviting industry professionals to speak at our events and meetups.</span></li>
-                        <li class="flex gap-3"><i data-lucide="smartphone" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Marketing:</b> Handling organic social media marketing (without relying on paid ads) to build genuine community growth.</span></li>
-                        <li class="flex gap-3"><i data-lucide="message-square" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Engagement:</b> Organizing fun activities, debates, and group discussions to ensure the audience isn't just listening, but actively participating.</span></li>
-                    </ul>
-                `,
-                socialLink: {
-                    img: "./images/THM.png",
-                    url: "https://www.linkedin.com/posts/vansham-kamboj_can-cybersecurity-be-entertaining-answer-activity-7352018503274590208-ddTZ?utm_source=share&utm_medium=member_desktop&rcm=ACoAADa3VwUBwfmJDSwSDVxUTbpdcD17CKGHA0U"
-                }
-            },
-            gdg: {
-                title: "GDG on campus ITMBU",
-                tag: "Creative Head",
-                year: "Past",
-                img: "./images/gdg-header.JPG",
-                desc: "Served as the Creative Head, blending design, marketing, and public speaking.",
-                details: `
-                    <h3 class="text-black font-bold text-2xl mb-4">Driving the Creative Vision</h3>
-                    <p class="mb-6">As the Creative Head for Google Developer Groups on campus, my primary focus was on establishing a strong visual and marketing presence for the community.</p>
-                    
-                    <h3 class="text-black font-bold text-2xl mb-4">Impact</h3>
-                    <p class="mb-6">I led all marketing and design efforts, ensuring our events looked professional and inviting. Beyond behind-the-scenes work, I was also a frequent speaker, delivering talks and engaging directly with the student developer community multiple times.</p>
-                `,
-                socialLink: {
-                    img: "./images/GDG.png",
-                    url: "https://www.instagram.com/p/DFZOFcyT4jO/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
-                }
-            },
-            technolab: {
-                title: "TechnoLab Club ITMBU",
-                tag: "Mentor",
-                year: "Ongoing",
-                img: "./images/techno-header.png",
-                desc: "Mentoring students and redefining how campus communities approach marketing.",
-                details: `
-                    <h3 class="text-black font-bold text-2xl mb-4">Guiding the Next Generation</h3>
-                    <p class="mb-6">At TechnoLab Club, we created a dedicated team that hosts engaging events, sessions, and workshops specifically designed to help students grow their skills.</p>
-                    
-                    <h3 class="text-black font-bold text-2xl mb-4">Revolutionizing Campus Marketing</h3>
-                    <p class="mb-6">One of my proudest achievements here was shifting the culture of campus marketing. We moved away from the traditional, "boring" community posts and started creating highly engaging, fun reels that actually resonated with the student body, vastly increasing our reach and engagement.</p>
-                `,
-                socialLink: {
-                    img: "./images/TECHNO.png",
-                    url: "https://www.instagram.com/p/DM7JZMGvsv-/"
-                }
-            },
-            pudao: {
-                title: "Pu Dao Web3 Community",
-                tag: "Event Manager",
-                year: "Ongoing",
-                img: "./images/pudao-header.JPG",
-                desc: "Managing events and logistics for a growing Web3 community.",
-                details: `
-                    <h3 class="text-black font-bold text-2xl mb-4">Into the Web3 Space</h3>
-                    <p class="mb-6">Web3 events require a different kind of energy and logistical approach. I assist Pu Dao in making sure their meetups run flawlessly.</p>
-                    
-                    <h3 class="text-black font-bold text-2xl mb-4">My Role</h3>
-                    <p class="mb-6">I help host the events, manage the floor, and handle the crucial task of swag distribution, ensuring every attendee leaves with a great impression of the community.</p>
-                `,
-                socialLink: {
-                    img: "./images/PUDAO.png",
-                    url: "https://x.com/pu_dao_/status/2021173615216165045?s=20"
-                }
+                sidebarLink.classList.add('active');
             }
-        };
-
-        function openCommunityModal(id) {
-            if(typeof audioManager !== 'undefined' && audioManager.playClick) {
-                audioManager.playClick();
-            }
-            
-            const data = communityData[id];
-            if(!data) return;
-
-            // Load Data
-            document.getElementById('modal-title').innerHTML = data.title;
-            document.getElementById('modal-desc').innerHTML = data.desc;
-            document.getElementById('modal-tag').innerHTML = data.tag;
-            document.getElementById('modal-year').innerHTML = data.year;
-            document.getElementById('modal-img').src = data.img;
-            document.getElementById('modal-body-content').innerHTML = data.details;
-            
-            // Build the Clickable Screenshot Card
-            if(data.socialLink) {
-                document.getElementById('modal-social-content').innerHTML = `
-                    <a href="${data.socialLink.url}" target="_blank" class="group relative block w-full overflow-hidden rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                        <div class="relative">
-                            <img src="${data.socialLink.img}" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105" alt="Social Proof">
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                <span class="bg-white text-black px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                    View Post <i data-lucide="external-link" class="w-3 h-3"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                `;
-            } else {
-                document.getElementById('modal-social-content').innerHTML = '';
-            }
-            
-            lucide.createIcons();
-
-            const modal = document.getElementById('project-modal');
-            const bg = document.getElementById('modal-bg');
-            const card = document.getElementById('modal-content-card');
-
-            modal.classList.remove('hide');
-
-            gsap.killTweensOf([bg, card]); 
-            
-            gsap.fromTo(bg, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-            gsap.fromTo(card, 
-                { opacity: 0, scale: 0.95, y: 20 }, 
-                { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "power3.out" }
-            );
         }
+    });
+});
 
-        function closeCommunityModal() {
-            if(typeof audioManager !== 'undefined' && audioManager.playClick) {
-                audioManager.playClick();
-            }
+// --------------------------------------------------------
+// MODAL DATA & LOGIC (Restored from your original code)
+// --------------------------------------------------------
+const communityData = {
+    aws: {
+        title: "AWS User Group Vadodara",
+        tag: "Volunteer",
+        year: "Ongoing",
+        img: "./images/aws-header.jpg",
+        desc: "Volunteering with the AWS User Group Vadodara to learn and manage massive tech events.",
+        details: `
+            <h3 class="text-black font-bold text-2xl mb-4">Managing Scale</h3>
+            <p class="mb-6">I played a pivotal role in organizing events that scaled to over 500+ attendees. Coordinating at this level requires immense planning, quick problem solving, and perfect execution.</p>
             
-            const modal = document.getElementById('project-modal');
-            const bg = document.getElementById('modal-bg');
-            const card = document.getElementById('modal-content-card');
-
-            gsap.killTweensOf([bg, card]);
-            
-            gsap.to(bg, { opacity: 0, duration: 0.3 });
-            gsap.to(card, { 
-                opacity: 0, 
-                scale: 0.95, 
-                y: 10, 
-                duration: 0.25, 
-                ease: "power2.in",
-                onComplete: () => {
-                    modal.classList.add('hide');
-                    gsap.set(card, { clearProps: "all" });
-                }
-            });
+            <h3 class="text-black font-bold text-2xl mb-4">My Core Contributions</h3>
+            <ul class="list-none space-y-4 mb-6">
+                <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Social Media Team:</b> Managed the digital footprint and marketing to drive registrations and build hype for an event of 500+ people.</span></li>
+                <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>On-Site Operations:</b> Worked directly on the ground to ensure the entire event ran smoothly, from crowd control to technical setups.</span></li>
+            </ul>
+        `,
+        socialLink: {
+            img: "./images/AWS.png", 
+            url: "https://www.linkedin.com/posts/vansham-kamboj_alwayslearning-awscommunityday-gratefulforopportunities-activity-7254410923409350656-UpRe?utm_source=share&utm_medium=member_desktop&rcm=ACoAADa3VwUBwfmJDSwSDVxUTbpdcD17CKGHA0U"
         }
+    },
+    hackers: {
+        title: "The Hackers Meetup",
+        tag: "Co-Lead",
+        year: "Vadodara Chapter",
+        img: "./images/thm-header.jpg",
+        desc: "Co-leading a premier cybersecurity community, focusing on engagement, team management, and operations.",
+        details: `
+            <h3 class="text-black font-bold text-2xl mb-4">End-to-End Workflow</h3>
+            <p class="mb-6">Because I also work as a designer for the community, I have a deep understanding of the entire workflow. My role goes far beyond just leading—it's about building an experience.</p>
+            
+            <h3 class="text-black font-bold text-2xl mb-4">Key Responsibilities</h3>
+            <ul class="list-none space-y-4 mb-6">
+                <li class="flex gap-3"><i data-lucide="map-pin" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Logistics:</b> Selecting venues perfectly suited for our audience size and technical needs.</span></li>
+                <li class="flex gap-3"><i data-lucide="users" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Networking:</b> Finding and inviting industry professionals to speak at our events and meetups.</span></li>
+                <li class="flex gap-3"><i data-lucide="smartphone" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Marketing:</b> Handling organic social media marketing (without relying on paid ads) to build genuine community growth.</span></li>
+                <li class="flex gap-3"><i data-lucide="message-square" class="w-6 h-6 text-purple-500 shrink-0"></i> <span><b>Engagement:</b> Organizing fun activities, debates, and group discussions to ensure the audience isn't just listening, but actively participating.</span></li>
+            </ul>
+        `,
+        socialLink: {
+            img: "./images/THM.png",
+            url: "https://www.linkedin.com/posts/vansham-kamboj_can-cybersecurity-be-entertaining-answer-activity-7352018503274590208-ddTZ?utm_source=share&utm_medium=member_desktop&rcm=ACoAADa3VwUBwfmJDSwSDVxUTbpdcD17CKGHA0U"
+        }
+    },
+    gdg: {
+        title: "GDG on campus ITMBU",
+        tag: "Creative Head",
+        year: "Past",
+        img: "./images/gdg-header.JPG",
+        desc: "Served as the Creative Head, blending design, marketing, and public speaking.",
+        details: `
+            <h3 class="text-black font-bold text-2xl mb-4">Driving the Creative Vision</h3>
+            <p class="mb-6">As the Creative Head for Google Developer Groups on campus, my primary focus was on establishing a strong visual and marketing presence for the community.</p>
+            
+            <h3 class="text-black font-bold text-2xl mb-4">Impact</h3>
+            <p class="mb-6">I led all marketing and design efforts, ensuring our events looked professional and inviting. Beyond behind-the-scenes work, I was also a frequent speaker, delivering talks and engaging directly with the student developer community multiple times.</p>
+        `,
+        socialLink: {
+            img: "./images/GDG.png",
+            url: "https://www.instagram.com/p/DFZOFcyT4jO/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+        }
+    },
+    technolab: {
+        title: "TechnoLab Club ITMBU",
+        tag: "Mentor",
+        year: "Ongoing",
+        img: "./images/techno-header.png",
+        desc: "Mentoring students and redefining how campus communities approach marketing.",
+        details: `
+            <h3 class="text-black font-bold text-2xl mb-4">Guiding the Next Generation</h3>
+            <p class="mb-6">At TechnoLab Club, we created a dedicated team that hosts engaging events, sessions, and workshops specifically designed to help students grow their skills.</p>
+            
+            <h3 class="text-black font-bold text-2xl mb-4">Revolutionizing Campus Marketing</h3>
+            <p class="mb-6">One of my proudest achievements here was shifting the culture of campus marketing. We moved away from the traditional, "boring" community posts and started creating highly engaging, fun reels that actually resonated with the student body, vastly increasing our reach and engagement.</p>
+        `,
+        socialLink: {
+            img: "./images/TECHNO.png",
+            url: "https://www.instagram.com/p/DM7JZMGvsv-/"
+        }
+    },
+    pudao: {
+        title: "Pu Dao Web3 Community",
+        tag: "Event Manager",
+        year: "Ongoing",
+        img: "./images/pudao-header.JPG",
+        desc: "Managing events and logistics for a growing Web3 community.",
+        details: `
+            <h3 class="text-black font-bold text-2xl mb-4">Into the Web3 Space</h3>
+            <p class="mb-6">Web3 events require a different kind of energy and logistical approach. I assist Pu Dao in making sure their meetups run flawlessly.</p>
+            
+            <h3 class="text-black font-bold text-2xl mb-4">My Role</h3>
+            <p class="mb-6">I help host the events, manage the floor, and handle the crucial task of swag distribution, ensuring every attendee leaves with a great impression of the community.</p>
+        `,
+        socialLink: {
+            img: "./images/PUDAO.png",
+            url: "https://x.com/pu_dao_/status/2021173615216165045?s=20"
+        }
+    }
+};
+
+function openCommunityModal(id) {
+    if(typeof audioManager !== 'undefined' && audioManager.playClick) {
+        audioManager.playClick();
+    }
+    
+    const data = communityData[id];
+    if(!data) return;
+
+    // Load Data
+    document.getElementById('modal-title').innerHTML = data.title;
+    document.getElementById('modal-desc').innerHTML = data.desc;
+    document.getElementById('modal-tag').innerHTML = data.tag;
+    document.getElementById('modal-year').innerHTML = data.year;
+    document.getElementById('modal-img').src = data.img;
+    document.getElementById('modal-body-content').innerHTML = data.details;
+    
+    // Build the Clickable Screenshot Card
+    if(data.socialLink) {
+        document.getElementById('modal-social-content').innerHTML = `
+            <a href="${data.socialLink.url}" target="_blank" class="group relative block w-full overflow-hidden rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div class="relative">
+                    <img src="${data.socialLink.img}" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105" alt="Social Proof">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                        <span class="bg-white text-black px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                            View Post <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        `;
+    } else {
+        document.getElementById('modal-social-content').innerHTML = '';
+    }
+    
+    lucide.createIcons();
+
+    const modal = document.getElementById('project-modal');
+    const bg = document.getElementById('modal-bg');
+    const card = document.getElementById('modal-content-card');
+
+    modal.classList.remove('hide');
+
+    gsap.killTweensOf([bg, card]); 
+    
+    gsap.fromTo(bg, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+    gsap.fromTo(card, 
+        { opacity: 0, scale: 0.95, y: 20 }, 
+        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "power3.out" }
+    );
+}
+
+function closeCommunityModal() {
+    if(typeof audioManager !== 'undefined' && audioManager.playClick) {
+        audioManager.playClick();
+    }
+    
+    const modal = document.getElementById('project-modal');
+    const bg = document.getElementById('modal-bg');
+    const card = document.getElementById('modal-content-card');
+
+    gsap.killTweensOf([bg, card]);
+    
+    gsap.to(bg, { opacity: 0, duration: 0.3 });
+    gsap.to(card, { 
+        opacity: 0, 
+        scale: 0.95, 
+        y: 10, 
+        duration: 0.25, 
+        ease: "power2.in",
+        onComplete: () => {
+            modal.classList.add('hide');
+            gsap.set(card, { clearProps: "all" });
+        }
+    });
+}
     </script>
 </body>
 </html>
